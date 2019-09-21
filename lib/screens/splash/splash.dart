@@ -16,22 +16,22 @@ class _SplashScreenState extends State<SplashScreen> {
   final key = GlobalKey<ClearMixin>();
   @override
   void initState() {
-    super.initState();
     getApps();
+    super.initState();
   }
   getApps()async{
     print("getting apps");
+    await Future.delayed(Duration(seconds: 2));
     apps = await GeekyLauncher.getApplications();
     apps.sort((a,b){
       return a.name.compareTo(b.name);
     });
-    setState(() {
-      explodeKey = Explode.getKey();
-    });
+    setState(() {});
   }
   update(List<AndroidApp> appList){
     setState(() {
       apps = appList;
+      explodeKey = Explode.getKey();
     });
     key.currentState.clear();
     WidgetsBinding.instance.addPostFrameCallback((_){
@@ -44,30 +44,25 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: apps==null?Center(
-              child: SizedBox(
-                width: 100,
-                  height: 100,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Colors.orange),
-                  )
-              ),
-            ):
-                AppGridList(
-                  apps: apps,
-                  key: key,
-                  onRemove: (AndroidApp app){
-                    setState(() {
-                      apps.removeWhere((t)=>t.packageName==app.packageName);
-                    });
-                  },
-                ),
+      resizeToAvoidBottomPadding: false,
+      body: apps==null?Center(
+        child: SizedBox(
+          width: 100,
+            height: 100,
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation(Colors.orange),
+            )
+        ),
+      ):
+          AppGridList(
+            apps: apps,
+            key: key,
+            onRemove: (AndroidApp app){
+              setState(() {
+                apps.removeWhere((t)=>t.packageName==app.packageName);
+              });
+            },
           ),
-        ],
-      ),
     );
   }
 

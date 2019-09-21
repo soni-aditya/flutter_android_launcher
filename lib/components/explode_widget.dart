@@ -34,7 +34,6 @@ class _ExplodeState extends State<Explode> with SingleTickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
   Animation<double> animationTwo;
-  Animation<double> shakeAnimation;
   var image;
   Math.Random random = new Math.Random();
   List<Color> colors = [];
@@ -46,23 +45,24 @@ class _ExplodeState extends State<Explode> with SingleTickerProviderStateMixin {
       ..addListener(() {
         setState(() {});
       });
-    shakeAnimation = Tween(begin: 0.0, end: 1.0).animate(
-        CurvedAnimation(parent: controller, curve: Interval(0.0, 0.2)));
     animation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
         parent: controller,
-        curve: Interval(0.2, 1.0,
-            curve: Curves.linearToEaseOut)));
+        curve: Curves.linear));
     check();
   }
 
-  void explode() {
-    if (controller.isDismissed) {
+  void explode()async {
+    print("explode called");
       controller.reset();
       controller.forward();
+      await Future.delayed(widget.duration);
       widget.onFinish();
-    }
   }
-
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
   void check() async {
     colors = widget.colors;
     particles = new List<Particle>.generate(widget.particleCount, (i) {
@@ -77,30 +77,27 @@ class _ExplodeState extends State<Explode> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    print("build");
     return InkWell(
-        child: controller.value < 0.4
-            ? Transform(
-                transform: Matrix4.translation(getTranslation()),
-                child: widget)
-            : CustomPaint(
+        child:
+//        controller.value < 0.4
+//            ? Transform(
+//                transform: Matrix4.translation(getTranslation()),
+//                child: widget)
+//            :
+        CustomPaint(
                 foregroundPainter: ParticlesPainter(animation.value),
+                size: widget.size,
                 child: Container(
                   width: widget.size.width,
                   height: widget.size.height,
                 ),
               ));
   }
-
-  Vector3 getTranslation() {
-    double progress = shakeAnimation.value;
-    double offset = 3 * Math.sin(progress * Math.pi * 2);
-    return Vector3(offset, offset, offset);
-  }
 }
 
 class ParticlesPainter extends CustomPainter {
   final double span;
-
   ParticlesPainter(this.span);
 
   @override
@@ -143,17 +140,17 @@ class Particle {
     initialLeft = left;
     initialTop = top;
     x = new Math.Random().nextInt(1000) / 1000.0;
-    leftMax = direction == 1 ? (left + 150 * x) : left - 200 * x;
-    topMax = top - 150;
-    bottomMax = initialTop + 150;
+    leftMax = direction == 1 ? (left + 100 * x) : left - 100 * x;
+    topMax = top - 100;
+    bottomMax = initialTop + 100;
   }
 
   advance(double span, bool stage, double height) {
     if (spread) {
       left = initialLeft * (1 - span) + leftMax * span;
       top = initialTop +
-          50 * span +
-          100 * Math.sin(Math.pi / 2 + 2 * span * Math.pi);
+          20 * span +
+          60 * Math.sin(Math.pi / 2 + 2 * span * Math.pi);
     } else {
       top = initialTop * (1 - span) + height * span;
     }

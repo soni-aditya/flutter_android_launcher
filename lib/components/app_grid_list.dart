@@ -17,6 +17,7 @@ class AppGridList extends StatefulWidget{
 class _AppGridListState extends State<AppGridList> with ClearMixin {
   @override
   Widget build(BuildContext context) {
+    print("length ${widget.apps.where((i)=>i.deleted).length}");
     return GridView.builder(
       physics: BouncingScrollPhysics(),
       padding: EdgeInsets.all(20),
@@ -46,38 +47,26 @@ class _AppGridListState extends State<AppGridList> with ClearMixin {
             showingContext=i;
           });
         },
-        child: widget.apps[i].deleted?Explode(
-          duration: Duration(seconds: 1),
-          size: Size(100,100),
-          colors: Colors.accents,
-          particleCount: 50,
-          onFinish: (){
-            setState(() {
-              widget.onRemove(widget.apps[i]);
-            });
-          },
-          key: explodeKey,
-          widget: Card(
-            color: Colors.transparent,
-            child: AppWidget(
+        child: Card(
+          color: Colors.transparent,
+          key: UniqueKey(),
+          child: widget.apps[i].deleted?Explode(
+            duration: Duration(milliseconds: 800),
+            size: Size(100,100),
+            colors: Colors.accents,
+            particleCount: 200,
+            onFinish: (){
+                widget.onRemove(widget.apps[i]);
+            },
+            key: explodeKey,
+            widget: AppWidget(
+              key: UniqueKey(),
               androidApp: widget.apps[i],
-              onDeleteFinally: (AndroidApp s){
-                setState(() {
-                  widget.onRemove(s);
-                });
-              },
               showingContextMenu: showingContext==i,
             ),
-          ),
-        ):Card(
-          color: Colors.transparent,
-          child: AppWidget(
+          ):AppWidget(
+            key: UniqueKey(),
             androidApp: widget.apps[i],
-            onDeleteFinally: (AndroidApp s){
-              setState(() {
-                widget.onRemove(s);
-              });
-            },
             showingContextMenu: showingContext==i,
           ),
         ),
