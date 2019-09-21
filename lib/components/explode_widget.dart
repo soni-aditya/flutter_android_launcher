@@ -1,6 +1,5 @@
 import 'dart:math' as Math;
 import 'package:flutter/material.dart';
-import 'package:vector_math/vector_math_64.dart';
 
 List<Particle> particles;
 
@@ -70,8 +69,7 @@ class _ExplodeState extends State<Explode> with SingleTickerProviderStateMixin {
           left: random.nextInt(widget.size.width.toInt() - 10).toDouble(),
           top: random.nextInt(widget.size.height.toInt() - 10).toDouble(),
           color: colors[i % colors.length],
-          sizeFactor: random.nextInt(1000).toDouble() / 1000,
-          spread: true);
+          sizeFactor: random.nextInt(1000).toDouble() / 1000,);
     });
   }
 
@@ -127,15 +125,13 @@ class Particle {
   double initialTop;
   double sizeFactor;
   Color color;
-  ExplodeType type;
-  final bool spread;
   int direction;
   double topMax;
   double leftMax;
   double bottomMax;
   double x;
 
-  Particle({this.left, this.top, this.color, this.sizeFactor, this.spread}) {
+  Particle({this.left, this.top, this.color, this.sizeFactor}) {
     direction = new Math.Random().nextBool() ? 1 : -1;
     initialLeft = left;
     initialTop = top;
@@ -146,15 +142,9 @@ class Particle {
   }
 
   advance(double span, bool stage, double height) {
-    if (spread) {
       left = initialLeft * (1 - span) + leftMax * span;
       top = initialTop +
           20 * span +
           60 * Math.sin(Math.pi / 2 + 2 * span * Math.pi);
-    } else {
-      top = initialTop * (1 - span) + height * span;
-    }
   }
 }
-
-enum ExplodeType { Spread, Drop }
